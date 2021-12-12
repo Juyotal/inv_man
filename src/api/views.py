@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.http import HttpResponse
+import datetime
 from . serializers import ItemSerializer, StoreSerializer
 from .models import Item, Store
 
@@ -10,11 +11,13 @@ from .models import Item, Store
 
 @api_view(['GET'])
 def apiOverview(request):
-
+    # now = datetime.datetime.now()
+    # html = "<html><body>It is now %s.</body></html>" % now
+    # return HttpResponse(html)
     api_urls = {
-        'Store List': '/store-list/',
+        'Store List': '/stores/',
         'Store Detail': '/stores/<str:store_pk>/',
-        # 'Store Inventory': '/store-inventory/<str:item_pk>/',
+        'Store Create': '/store-create/',
         'Item Detail': '/items/<str:item_pk > /',
         'Item Add': '/item-add/',
         'Item Update': '/item-update/<str:item_pk>/',
@@ -56,22 +59,32 @@ def item_create(request, store_pk):
     item  =Item.objects.create(
         store = store,
         name = data["name"],
-        count_in_stock = data["count"],
-        cost_price = data["price"],
+        count_in_stock = int(data["count_in_stock"]),
+        cost_price = float(data["cost_price"]),
         category = data["category"],
-        markup = data["markup"],
+        markup = float(data["markup"]),
     )
 
     serializer = ItemSerializer(item, many=False)
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+def store_create(request):
+    data = request.data
+    store = Store.objects.create(
+        name=data["name"]
+    )
+
+    serializer = StoreSerializer(store, many=False)
+    return Response(serializer.data)
+
 @api_view(['PUT'])
 def item_update(request, item_pk):
     data = request.data
     item = Item.objects.get(_id=item_pk)
 
-    item.count_in_stock = data['count']
+    item.count_in_stock = int(data['count'])
     item.save()
     serializer = ItemSerializer(item, many=False)
 

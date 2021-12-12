@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.apiOverview, name="basis"),
-    path('store-list/', views.home_page, name="stores"),
+    path('stores/', views.home_page, name="stores"),
+    path('store-create/', views.store_create, name="store-create"),
     path('stores/<int:store_pk>/', views.store_detail, name="store"),
     path('items/<str:item_pk>/', views.item_detail, name="item"),
     path('<int:store_pk>/item-add/', views.item_create, name="item-add"),
